@@ -28,15 +28,16 @@ fn total_number_of_scratch_cards_won(input: &str) -> u32 {
     let mut cards_won: Vec<u32> = vec![1; input.lines().count()];
 
     for (current_line, line) in input.lines().enumerate() {
-        let winning_count = count_winning_nos_for_line(line);
-        let add_value = cards_won[current_line];
-        let mut line_to: usize = (winning_count) as usize + current_line;
-        if line_to > input.lines().count() {
-            line_to = input.lines().count();
-        }
-        for value in current_line + 1..=line_to {
-            cards_won[value] += add_value;
-        }
+        let line_to: usize = {
+            let mut temp_line_to = (count_winning_nos_for_line(line)) as usize + current_line;
+            if temp_line_to > input.lines().count() {
+                temp_line_to = input.lines().count();
+            }
+            temp_line_to
+        };
+        (current_line + 1..=line_to)
+            .into_iter()
+            .for_each(|value| cards_won[value] += cards_won[current_line]);
     }
 
     cards_won.iter().sum()
