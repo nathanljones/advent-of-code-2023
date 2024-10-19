@@ -18,9 +18,8 @@ fn main() {
     let humidity_to_location_map = map_values(parsed_input[7]);
 
     let mut after_map_values: Vec<u32> = Vec::new();
-
-    for seed in seeds {
-        let soil_mapped = map_source_to_destination(&seed_to_soil_map, seed);
+    seeds.iter().for_each(|seed| {
+        let soil_mapped = map_source_to_destination(&seed_to_soil_map, *seed);
         let fertilizer_mapped = map_source_to_destination(&soil_to_fertilizer_map, soil_mapped);
         let water_mapped = map_source_to_destination(&fertilizer_to_water_map, fertilizer_mapped);
         let light_mapped = map_source_to_destination(&water_to_light_map, water_mapped);
@@ -30,7 +29,8 @@ fn main() {
             &humidity_to_location_map,
             humidity_mapped,
         ));
-    }
+    });
+
     println!("{:?}", after_map_values);
     println!("Answer");
     println!("{:?}", after_map_values.iter().min());
