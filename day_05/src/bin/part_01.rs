@@ -7,13 +7,6 @@ struct MapLine {
 fn main() {
     let inputs = include_str!("input.txt");
     let parsed_input: Vec<&str> = inputs.split("\n\n").collect();
-    println!("{:?}", parsed_input[1]);
-    println!("{:?}", parsed_input[2]);
-    println!("{:?}", parsed_input[3]);
-    println!("{:?}", parsed_input[4]);
-    println!("{:?}", parsed_input[5]);
-    println!("{:?}", parsed_input[6]);
-    println!("{:?}", parsed_input[7]);
 
     let seeds = get_seeds(parsed_input[0]);
     let seed_to_soil_map = map_values(parsed_input[1]);
@@ -47,17 +40,18 @@ fn map_values(input: &str) -> Vec<MapLine> {
     let part_parse: Vec<&str> = input.split(':').collect();
     let seed_parse: Vec<&str> = part_parse[1].split('\n').collect();
     let mut mappings: Vec<MapLine> = Vec::new();
-    for line in seed_parse {
-        if !line.is_empty() {
-            mappings.push(parse_input_line(line));
-        };
-    }
+    seed_parse
+        .iter()
+        .filter(|line| !line.is_empty())
+        .for_each(|line| mappings.push(parse_input_line(line)));
+
     mappings
 }
 fn map_source_to_destination(mappings: &Vec<MapLine>, source_number: u32) -> u32 {
     let mut stored_range_start: u32 = 0;
     let mut found: bool = false;
     let mut ret_val: u32 = 0;
+
     for map_line in mappings {
         if map_line.source_range_start >= stored_range_start
             && source_number > map_line.source_range_start
