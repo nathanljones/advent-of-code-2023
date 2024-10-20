@@ -3,30 +3,18 @@ fn main() {
     println!("{}", get_sum_for_lines(inputs));
 }
 fn get_sum_for_lines(lines: &str) -> u32 {
-    let mut running_total = 0;
-    for line in lines.lines() {
-        running_total += get_number_for_line(line);
-    }
-    running_total
+    lines
+        .lines()
+        .into_iter()
+        .map(|line| get_number_for_line(line))
+        .sum()
 }
 fn get_number_for_line(line: &str) -> u32 {
-    let mut first_no = 0;
-    let mut second_no = 0;
-    for character in line.chars() {
-        if character.is_numeric() {
-            if first_no == 0 {
-                first_no = character.to_digit(10).unwrap();
-            }
-            if first_no != 0 {
-                second_no = character.to_digit(10).unwrap();
-            }
-        }
-    }
-    if second_no == 0 {
-        second_no = first_no;
-    }
+    let numbers_as_string: Vec<char> = line.chars().filter(|char| char.is_numeric()).collect();
 
-    first_no * 10 + second_no
+    let first_number = numbers_as_string.first().unwrap().to_digit(10).unwrap();
+    let second_number = numbers_as_string.last().unwrap().to_digit(10).unwrap();
+    first_number * 10 + second_number
 }
 
 #[cfg(test)]
