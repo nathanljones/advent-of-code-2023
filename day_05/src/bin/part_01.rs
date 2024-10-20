@@ -1,8 +1,8 @@
 #[derive(Debug, PartialEq)]
 struct MapLine {
-    destination_range_start: u32,
-    source_range_start: u32,
-    range_length: u32,
+    destination_range_start: u64,
+    source_range_start: u64,
+    range_length: u64,
 }
 fn main() {
     let inputs = include_str!("input.txt");
@@ -17,23 +17,23 @@ fn main() {
     let temparature_to_humidity_map = map_values(parsed_input[6]);
     let humidity_to_location_map = map_values(parsed_input[7]);
 
-    let mut after_map_values: Vec<u32> = Vec::new();
-    seeds.iter().for_each(|seed| {
-        let soil_mapped = map_source_to_destination(&seed_to_soil_map, *seed);
-        let fertilizer_mapped = map_source_to_destination(&soil_to_fertilizer_map, soil_mapped);
-        let water_mapped = map_source_to_destination(&fertilizer_to_water_map, fertilizer_mapped);
-        let light_mapped = map_source_to_destination(&water_to_light_map, water_mapped);
-        let temp_mapped = map_source_to_destination(&light_to_temparature_map, light_mapped);
-        let humidity_mapped = map_source_to_destination(&temparature_to_humidity_map, temp_mapped);
-        after_map_values.push(map_source_to_destination(
-            &humidity_to_location_map,
-            humidity_mapped,
-        ));
-    });
-
-    println!("{:?}", after_map_values);
+    //let mut after_map_values: Vec<u64> = Vec::new();
+    let after_map_values: Vec<u32> = seeds
+        .iter()
+        .map(|seed| {
+            let soil_mapped = map_source_to_destination(&seed_to_soil_map, *seed);
+            let fertilizer_mapped = map_source_to_destination(&soil_to_fertilizer_map, soil_mapped);
+            let water_mapped =
+                map_source_to_destination(&fertilizer_to_water_map, fertilizer_mapped);
+            let light_mapped = map_source_to_destination(&water_to_light_map, water_mapped);
+            let temp_mapped = map_source_to_destination(&light_to_temparature_map, light_mapped);
+            let humidity_mapped =
+                map_source_to_destination(&temparature_to_humidity_map, temp_mapped);
+            map_source_to_destination(&humidity_to_location_map, humidity_mapped)
+        })
+        .collect();
     println!("Answer");
-    println!("{:?}", after_map_values.iter().min());
+    println!("{:?}", after_map_values.iter().min().unwrap());
 }
 
 fn map_values(input: &str) -> Vec<MapLine> {
@@ -48,40 +48,28 @@ fn map_values(input: &str) -> Vec<MapLine> {
     mappings
 }
 fn map_source_to_destination(mappings: &Vec<MapLine>, source_number: u32) -> u32 {
-    let mut stored_range_start: u32 = 0;
-    let mut found: bool = false;
-    let mut ret_val: u32 = 0;
+    let found_mapping: Vec<_> = mappings
+        .iter()
+        .filter(|mapping| {
+            mapping.source_range_start <= source_number as u64
+                && source_number as u64 <= mapping.source_range_start + mapping.range_length
+        })
+        .collect();
 
-    for map_line in mappings {
-        if map_line.source_range_start >= stored_range_start
-            && source_number > map_line.source_range_start
-        {
-            stored_range_start = map_line.source_range_start;
-            found = true;
-        }
+    if found_mapping.len() == 0 {
+        return source_number;
     }
 
-    if !found {
-        ret_val = source_number;
-    } else {
-        for map_line in mappings {
-            if map_line.source_range_start == stored_range_start {
-                let adjusted_source_number = source_number - map_line.source_range_start;
-                if adjusted_source_number > map_line.range_length {
-                    ret_val = source_number;
-                } else {
-                    ret_val = adjusted_source_number + map_line.destination_range_start;
-                }
-            }
-        }
-    }
-    ret_val
+    (found_mapping[0].destination_range_start
+        + (source_number as u64 - found_mapping[0].source_range_start))
+        .try_into()
+        .unwrap()
 }
 
 fn parse_input_line(input_line: &str) -> MapLine {
-    let splits: Vec<u32> = input_line
+    let splits: Vec<u64> = input_line
         .split_whitespace()
-        .map(|x| x.parse::<u32>().unwrap())
+        .map(|x| x.parse::<u64>().unwrap())
         .collect();
     MapLine {
         destination_range_start: splits[0],
