@@ -7,11 +7,11 @@ fn main() {
     println!("{}", get_sum_for_lines(inputs));
 }
 fn get_sum_for_lines(lines: &str) -> u32 {
-    let mut running_total = 0;
-    for line in lines.lines() {
-        running_total += get_number_for_line(line);
-    }
-    running_total
+    lines
+        .lines()
+        .into_iter()
+        .map(|line| get_number_for_line(line))
+        .sum()
 }
 fn fill_find_structure() -> Vec<FindChars> {
     let mut ret_vec: Vec<FindChars> = vec![];
