@@ -1,2 +1,2 @@
-# Advent of Code 2023
-My solutions to Advent of Code 2023. NB version history prior to Jan 2024 was wiped out as I removed the inputs file
+# Advent of Code 2023 (Archived)
+This project is now archived as it has moved a new repository (advent-of-code)
